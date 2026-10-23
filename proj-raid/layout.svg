@@ -1,0 +1,166 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1980" viewBox="0 0 800 1980" role="img" aria-labelledby="title description">
+  <title id="title">Current and target disk layouts</title>
+  <desc id="description">Vertical diagrams comparing the current disk layout with the target RAID and LVM partition layout.</desc>
+
+  <defs>
+    <style>
+      .title { font: 700 28px sans-serif; fill: #0f172a; }
+      .subtitle { font: 400 15px sans-serif; fill: #64748b; }
+      .disk-name { font: 700 20px sans-serif; fill: #0f172a; }
+      .partition-title { font: 700 17px sans-serif; fill: #ffffff; }
+      .partition-detail { font: 400 14px sans-serif; fill: #dbeafe; }
+      .empty-title { font: 700 17px sans-serif; fill: #334155; }
+      .empty-detail { font: 400 14px sans-serif; fill: #64748b; }
+      .callout-title { font: 700 15px sans-serif; fill: #111827; }
+      .callout-detail { font: 500 14px sans-serif; fill: #111827; }
+    </style>
+  </defs>
+
+  <rect width="800" height="1980" fill="#ffffff"/>
+  <text x="40" y="52" class="title">Current disk layout</text>
+
+  <g transform="translate(-260 0)">
+  <!-- 2 TB disk -->
+  <text x="300" y="102" class="disk-name">/dev/vda</text>
+
+  <rect x="300" y="130" width="220" height="480" fill="#cbd5e1" stroke="#0f172a" stroke-width="2"/>
+  <rect x="300" y="130" width="220" height="58" fill="#f59e0b"/>
+  <rect x="300" y="188" width="220" height="422" fill="#2563eb"/>
+
+  <text x="410" y="153" text-anchor="middle" class="callout-title">/dev/vda1</text>
+  <text x="410" y="175" text-anchor="middle" class="callout-detail">512 MiB · ESP</text>
+
+  <text x="410" y="380" text-anchor="middle" class="partition-title">/dev/vda2</text>
+  <text x="410" y="407" text-anchor="middle" class="partition-detail">Linux filesystem</text>
+  <text x="410" y="430" text-anchor="middle" class="partition-detail">remaining space</text>
+
+  <!-- 1 TB disk -->
+  <text x="580" y="102" class="disk-name">/dev/vdb</text>
+
+  <rect x="580" y="130" width="220" height="240" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2" stroke-dasharray="8 7"/>
+  <text x="690" y="242" text-anchor="middle" class="empty-title">Unpartitioned</text>
+  <text x="690" y="268" text-anchor="middle" class="empty-detail">No partitions yet</text>
+
+  <!-- Capacity guide -->
+  <line x1="930" y1="130" x2="930" y2="610" stroke="#cbd5e1" stroke-width="2"/>
+  <line x1="923" y1="130" x2="937" y2="130" stroke="#94a3b8" stroke-width="2"/>
+  <line x1="923" y1="370" x2="937" y2="370" stroke="#94a3b8" stroke-width="2"/>
+  <line x1="923" y1="610" x2="937" y2="610" stroke="#94a3b8" stroke-width="2"/>
+  <text x="946" y="135" class="subtitle">0</text>
+  <text x="946" y="375" class="subtitle">1 TB</text>
+  <text x="946" y="615" class="subtitle">2 TB</text>
+  </g>
+
+  <line x1="40" y1="680" x2="760" y2="680" stroke="#e2e8f0" stroke-width="2"/>
+  <text x="40" y="752" class="title">Target disk layout 1</text>
+
+  <g transform="translate(-260 700)">
+  <!-- Target 2 TB disk -->
+  <text x="300" y="102" class="disk-name">/dev/vda</text>
+
+  <rect x="300" y="130" width="220" height="480" fill="#cbd5e1" stroke="#0f172a" stroke-width="2"/>
+  <rect x="300" y="130" width="220" height="58" fill="#f59e0b"/>
+  <rect x="300" y="188" width="220" height="182" fill="#16a34a"/>
+  <rect x="300" y="370" width="220" height="240" fill="#2563eb"/>
+
+  <text x="410" y="153" text-anchor="middle" class="callout-title">/dev/vda1</text>
+  <text x="410" y="175" text-anchor="middle" class="callout-detail">512 MiB · ESP</text>
+
+  <text x="410" y="260" text-anchor="middle" class="partition-title">/dev/vda2</text>
+  <text x="410" y="287" text-anchor="middle" class="partition-detail">~1 TB · Linux RAID</text>
+  <text x="410" y="310" text-anchor="middle" class="partition-detail">RAID1 member</text>
+
+  <text x="410" y="470" text-anchor="middle" class="partition-title">/dev/vda3</text>
+  <text x="410" y="497" text-anchor="middle" class="partition-detail">~1 TB · Linux LVM</text>
+  <text x="410" y="520" text-anchor="middle" class="partition-detail">unprotected storage</text>
+
+  <!-- Target 1 TB disk -->
+  <text x="580" y="102" class="disk-name">/dev/vdb</text>
+
+  <rect x="580" y="130" width="220" height="240" fill="#cbd5e1" stroke="#0f172a" stroke-width="2"/>
+  <rect x="580" y="130" width="220" height="58" fill="#f59e0b"/>
+  <rect x="580" y="188" width="220" height="182" fill="#16a34a"/>
+
+  <text x="690" y="153" text-anchor="middle" class="callout-title">/dev/vdb1</text>
+  <text x="690" y="175" text-anchor="middle" class="callout-detail">512 MiB · ESP</text>
+
+  <text x="690" y="260" text-anchor="middle" class="partition-title">/dev/vdb2</text>
+  <text x="690" y="287" text-anchor="middle" class="partition-detail">~1 TB · Linux RAID</text>
+  <text x="690" y="310" text-anchor="middle" class="partition-detail">RAID1 member</text>
+
+  <!-- Logical RAID1 space -->
+  <rect x="300" y="188" width="500" height="182" fill="none" stroke="#dc2626" stroke-width="3"/>
+  <text x="865" y="270" text-anchor="middle" style="font: 700 16px sans-serif; fill: #111827;">/dev/md0</text>
+  <text x="865" y="294" text-anchor="middle" style="font: 700 16px sans-serif; fill: #111827;">RAID1</text>
+
+  <!-- Target capacity guide -->
+  <line x1="930" y1="130" x2="930" y2="610" stroke="#cbd5e1" stroke-width="2"/>
+  <line x1="923" y1="130" x2="937" y2="130" stroke="#94a3b8" stroke-width="2"/>
+  <line x1="923" y1="370" x2="937" y2="370" stroke="#94a3b8" stroke-width="2"/>
+  <line x1="923" y1="610" x2="937" y2="610" stroke="#94a3b8" stroke-width="2"/>
+  <text x="946" y="135" class="subtitle">0</text>
+  <text x="946" y="375" class="subtitle">1 TB</text>
+  <text x="946" y="615" class="subtitle">2 TB</text>
+  </g>
+
+  <line x1="40" y1="1340" x2="760" y2="1340" stroke="#e2e8f0" stroke-width="2"/>
+  <text x="40" y="1402" class="title">Target disk layout 2</text>
+
+  <g transform="translate(-260 1350)">
+  <!-- 2 TB disk with independent /boot -->
+  <text x="300" y="102" class="disk-name">/dev/vda</text>
+
+  <rect x="300" y="130" width="220" height="480" fill="#cbd5e1" stroke="#0f172a" stroke-width="2"/>
+  <rect x="300" y="130" width="220" height="50" fill="#f59e0b"/>
+  <rect x="300" y="180" width="220" height="50" fill="#0284c7"/>
+  <rect x="300" y="230" width="220" height="140" fill="#16a34a"/>
+  <rect x="300" y="370" width="220" height="240" fill="#2563eb"/>
+
+  <text x="410" y="150" text-anchor="middle" class="callout-title">/dev/vda1</text>
+  <text x="410" y="170" text-anchor="middle" class="callout-detail">512 MiB · ESP</text>
+
+  <text x="410" y="200" text-anchor="middle" class="partition-title">/dev/vda2</text>
+  <text x="410" y="220" text-anchor="middle" class="partition-detail">1 GiB · /boot</text>
+
+  <text x="410" y="274" text-anchor="middle" class="partition-title">/dev/vda3</text>
+  <text x="410" y="299" text-anchor="middle" class="partition-detail">~1 TB · Linux RAID</text>
+  <text x="410" y="322" text-anchor="middle" class="partition-detail">RAID1 member</text>
+
+  <text x="410" y="470" text-anchor="middle" class="partition-title">/dev/vda4</text>
+  <text x="410" y="497" text-anchor="middle" class="partition-detail">~1 TB · Linux LVM</text>
+  <text x="410" y="520" text-anchor="middle" class="partition-detail">unprotected storage</text>
+
+  <!-- 1 TB disk with independent /boot -->
+  <text x="580" y="102" class="disk-name">/dev/vdb</text>
+
+  <rect x="580" y="130" width="220" height="240" fill="#cbd5e1" stroke="#0f172a" stroke-width="2"/>
+  <rect x="580" y="130" width="220" height="50" fill="#f59e0b"/>
+  <rect x="580" y="180" width="220" height="50" fill="#0284c7"/>
+  <rect x="580" y="230" width="220" height="140" fill="#16a34a"/>
+
+  <text x="690" y="150" text-anchor="middle" class="callout-title">/dev/vdb1</text>
+  <text x="690" y="170" text-anchor="middle" class="callout-detail">512 MiB · ESP</text>
+
+  <text x="690" y="200" text-anchor="middle" class="partition-title">/dev/vdb2</text>
+  <text x="690" y="220" text-anchor="middle" class="partition-detail">1 GiB · backup /boot</text>
+
+  <text x="690" y="274" text-anchor="middle" class="partition-title">/dev/vdb3</text>
+  <text x="690" y="299" text-anchor="middle" class="partition-detail">~1 TB · Linux RAID</text>
+  <text x="690" y="322" text-anchor="middle" class="partition-detail">RAID1 member</text>
+
+  <!-- Logical RAID1 space -->
+  <rect x="300" y="230" width="500" height="140" fill="none" stroke="#dc2626" stroke-width="3"/>
+  <text x="865" y="292" text-anchor="middle" style="font: 700 16px sans-serif; fill: #111827;">/dev/md0</text>
+  <text x="865" y="316" text-anchor="middle" style="font: 700 16px sans-serif; fill: #111827;">RAID1</text>
+
+  <!-- Capacity guide -->
+  <line x1="930" y1="130" x2="930" y2="610" stroke="#cbd5e1" stroke-width="2"/>
+  <line x1="923" y1="130" x2="937" y2="130" stroke="#94a3b8" stroke-width="2"/>
+  <line x1="923" y1="370" x2="937" y2="370" stroke="#94a3b8" stroke-width="2"/>
+  <line x1="923" y1="610" x2="937" y2="610" stroke="#94a3b8" stroke-width="2"/>
+  <text x="946" y="135" class="subtitle">0</text>
+  <text x="946" y="375" class="subtitle">1 TB</text>
+  <text x="946" y="615" class="subtitle">2 TB</text>
+  </g>
+
+</svg>

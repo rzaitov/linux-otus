@@ -1,5 +1,7 @@
 # RAID1 на рабочем компьютере
 
+Work in progress
+
 Я хочу использовать RAID1 для рабочего компьютера, чтобы в случае отказа одного
 из SSD дисков моя работа не остановилась.
 
@@ -19,52 +21,52 @@ RAID массив, чтобы обойтись без существенной �
 # Part 1
 
 Предположим, что в моем распоряжении 2 SSD диска:
-* /dev/vdb - 2TB
-* /dev/vdc - 1TB
+* /dev/vda - 2TB
+* /dev/vdb - 1TB
 
-`/dev/vdb` - это основной диск, на котором сейчас находится загрузчик и
+`/dev/vda` - это основной диск, на котором сейчас находится загрузчик и
 установлена операционная система:
-* /dev/vdb1 - 512MiB ESP (EFI System)
-* /dev/vdb2 - Linux filesystem
+* /dev/vda1 - 512MiB ESP (EFI System)
+* /dev/vda2 - Linux filesystem
 
 > **TODO:** нужно описать миграцию существующей системы. Возможный вариант -
 > это создать degraded RAID1 на новом SSD, перенести на него данные, потом
 > переразметить старый SSD и добавить его раздел в raid массив.
 
 Т.к. я хочу 1TB этого диска поместить в raid массив но нужно будет иметь 3 раздела:
-* /dev/vdb1 - 512MiB ESP (EFI System)
-* /dev/vdb2 - ~1TB Linux RAID
-* /dev/vdb3 - Linux LVM (for unimportant data)
+* /dev/vda1 - 512MiB ESP (EFI System)
+* /dev/vda2 - ~1TB Linux RAID
+* /dev/vda3 - Linux LVM (for unimportant data)
 
 Поскольку я хочу защититься от потери любого из дисков, то на каждом из дисков
-должен быть EFI раздел. Это означает что и на диске /dev/vdc должно быть 2
+должен быть EFI раздел. Это означает что и на диске /dev/vdb должно быть 2
 раздела:
-* /dev/vdc1 - 512MiB ESP (backup EFI System)
-* /dev/vdc2 - оставшееся пространство (~1TB за вычетом ESP), Linux RAID
+* /dev/vdb1 - 512MiB ESP (backup EFI System)
+* /dev/vdb2 - оставшееся пространство (~1TB за вычетом ESP), Linux RAID
 
-Поскольку ESP занимает 512MiB, раздел `/dev/vdc2` будет немного меньше 1TB.
-Сначала нужно создать `/dev/vdc2`, а затем создать `/dev/vdb2` с точно таким же
+Поскольку ESP занимает 512MiB, раздел `/dev/vdb2` будет немного меньше 1TB.
+Сначала нужно создать `/dev/vdb2`, а затем создать `/dev/vda2` с точно таким же
 количеством секторов (либо немного меньше). Размер RAID1 будет определяться
 размером меньшего из двух разделов.
 
-Разделы `/dev/vdb2` и `/dev/vdc2` нужно объединить в RAID1 массив (зеркало):
+Разделы `/dev/vda2` и `/dev/vdb2` нужно объединить в RAID1 массив (зеркало):
 ```bash
 $ mdadm --create /dev/md0 \
     --bitmap=internal \
     --level=1 --raid-devices=2 \
-    /dev/vdb2 /dev/vdc2
+    /dev/vda2 /dev/vdb2
 ```
 
 Далее создадим два physical volume под управлением LVM:
 ```bash
 $ pvcreate /dev/md0
-$ pvcreate /dev/vdb3
+$ pvcreate /dev/vda3
 ```
 
 Объединим их в одну группу, чтобы в будущем иметь возможность перемещать данные
 между ними при работающей системе:
 ```bash
-$ vgcreate vg0 /dev/md0 /dev/vdb3
+$ vgcreate vg0 /dev/md0 /dev/vda3
 ```
 
 Внутри `vg0` уже создадим логические разделы, которые отформатируем с помощью
@@ -75,7 +77,7 @@ $ lvcreate -L 128G -n lv-system vg0 /dev/md0
 $ lvcreate -L 256G -n lv-home vg0 /dev/md0
 
 # non-raid logical volume
-$ lvcreate -L 256G -n lv-data vg0 /dev/vdb3
+$ lvcreate -L 256G -n lv-data vg0 /dev/vda3
 ```
 
 Создадим файловую систему на этих логических разделах:
@@ -98,7 +100,7 @@ shim.
 
 ## Advanced details
 
-Если `/dev/vdb` выйдет из строя, то `/dev/vdb3` станет недоступен, а `vg0`
+Если `/dev/vda` выйдет из строя, то `/dev/vda3` станет недоступен, а `vg0`
 перейдет в partial state. Логические тома `lv-system` и `lv-home` останутся
 доступны через `/dev/md0`, но `lv-data` будет недоступен. Чтобы отсутствие
 необязательного логического раздела `lv-data` не останавливало загрузку
