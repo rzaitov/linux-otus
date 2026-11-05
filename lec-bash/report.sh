@@ -2,6 +2,12 @@
 
 set -euo pipefail
 
+# https://man7.org/linux/man-pages/man1/flock.1.html
+lock="/run/lock/$(basename "$0").lock"
+if [[ ${FLOCKER:-} != "$lock" ]]; then
+	FLOCKER="$lock" exec flock --exclusive --nonblock --conflict-exit-code 99 "$lock" "$0" "$@"
+fi
+
 function main() {
 	local log_file=${1:-access.log}
 	local n=${TOP:-10}
