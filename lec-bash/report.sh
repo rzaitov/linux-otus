@@ -40,17 +40,18 @@ function get_urls() {
 
 function get_errors() {
 	awk -F'"' '{
-		split($3, code_size, " ")
-		code = code_size[1]
-		if (code ~ /4../) { print "4xx"; next }
-		if (code ~ /5../) { print "5xx"; next }
+		split($3, resp_info, " ")
+		code = resp_info[1]
+		if (code >= 400 && code < 500) { print "4xx" }
+		if (code >= 500 && code < 600) { print "5xx" }
   }'
 }
 
 function get_codes() {
 	awk -F'"' '{
-		split($3, code_size, " ")
-		print code_size[1]
+		split($3, resp_info, " ")
+		code = resp_info[1]
+		print code
 	}'
 }
 
