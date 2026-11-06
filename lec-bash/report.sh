@@ -15,7 +15,7 @@ top=10
 since=0
 
 function main() {
-	local log_file=${1:-access.log}
+	local log_file=$1
 
 	printf "Top %d IPs:\n" "$top"
 	get_ips "$since" < "$log_file" | stats | head -n "$top"
