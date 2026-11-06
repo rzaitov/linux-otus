@@ -9,12 +9,13 @@ if [[ ${FLOCKER:-} != "$lock" ]]; then
 fi
 
 src_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+prog=${BASH_SOURCE[0]##*/}
+timestamp_file="${src_dir}/.${prog}.timestamp"
+since=0
 
 function main() {
 	local log_file=${1:-access.log}
 	local n=${TOP:-10}
-
-	local since=1565817878
 
 	printf "Top %d IPs:\n" "$n"
 	get_ips "$since" < "$log_file" | stats | head -n "$n"
@@ -30,6 +31,8 @@ function main() {
 
 	printf "HTTP codes:\n"
 	get_codes "$since" < "$log_file" | stats
+
+	date --iso-8601=seconds > "$timestamp_file"
 }
 
 function get_ips() {
@@ -96,5 +99,40 @@ function stats() {
 		uniq --count |
 		sort --key 1 --numeric-sort --reverse
 }
+
+parsed=$(getopt \
+	--options "" \
+	--longoptions "timestamp-file:" \
+	--name "$0" \
+	-- "$@")
+eval set -- "$parsed"
+unset parsed
+
+while true; do
+	case $1 in
+		--timestamp-file)
+			timestamp_file=$2
+			shift 2
+			;;
+		--)
+			shift
+			break
+			;;
+		*)
+			printf "Internal error: unhandled option %s\n" "$1" >&2
+			exit 2
+			;;
+	esac
+done
+
+if [[ -f $timestamp_file ]]; then
+	# don't use `read -r var` due to `set -e`
+	timestamp=$(<"$timestamp_file")
+	# date --date=' ' produces the begining of the current day
+	if [[ $timestamp != *[^[:space:]]* ]] || ! since=$(date --date="$timestamp" +%s); then
+		printf "Invalid date in timestamp file: %s\n" "$timestamp_file" >&2
+		exit 1
+	fi
+fi
 
 main "$@"
