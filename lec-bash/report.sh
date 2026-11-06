@@ -11,18 +11,18 @@ fi
 src_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 prog=${BASH_SOURCE[0]##*/}
 timestamp_file="${src_dir}/.${prog}.timestamp"
+top=10
 since=0
 
 function main() {
 	local log_file=${1:-access.log}
-	local n=${TOP:-10}
 
-	printf "Top %d IPs:\n" "$n"
-	get_ips "$since" < "$log_file" | stats | head -n "$n"
+	printf "Top %d IPs:\n" "$top"
+	get_ips "$since" < "$log_file" | stats | head -n "$top"
 	printf "\n"
 
-	printf "Top %d URLs:\n" "$n"
-	get_urls "$since" < "$log_file" | stats | head -n "$n"
+	printf "Top %d URLs:\n" "$top"
+	get_urls "$since" < "$log_file" | stats | head -n "$top"
 	printf "\n"
 
 	printf "Errors stats:\n"
@@ -102,7 +102,7 @@ function stats() {
 
 parsed=$(getopt \
 	--options "" \
-	--longoptions "timestamp-file:" \
+	--longoptions "timestamp-file:,top:" \
 	--name "$0" \
 	-- "$@")
 eval set -- "$parsed"
@@ -112,6 +112,10 @@ while true; do
 	case $1 in
 		--timestamp-file)
 			timestamp_file=$2
+			shift 2
+			;;
+		--top)
+			top=$2
 			shift 2
 			;;
 		--)
