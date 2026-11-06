@@ -8,57 +8,87 @@ if [[ ${FLOCKER:-} != "$lock" ]]; then
 	FLOCKER="$lock" exec flock --exclusive --nonblock --conflict-exit-code 99 "$lock" "$0" "$@"
 fi
 
+src_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+
 function main() {
 	local log_file=${1:-access.log}
 	local n=${TOP:-10}
 
+	local since=1565817878
+
 	printf "Top %d IPs:\n" "$n"
-	get_ips < "$log_file" | stats | head -n "$n"
+	get_ips "$since" < "$log_file" | stats | head -n "$n"
 	printf "\n"
 
 	printf "Top %d URLs:\n" "$n"
-	get_urls < "$log_file" | stats | head -n "$n"
+	get_urls "$since" < "$log_file" | stats | head -n "$n"
 	printf "\n"
 
 	printf "Errors stats:\n"
-	get_errors < "$log_file" | stats
+	get_errors "$since" < "$log_file" | stats
 	printf "\n"
 
 	printf "HTTP codes:\n"
-	get_codes < "$log_file" | stats
+	get_codes "$since" < "$log_file" | stats
 }
 
 function get_ips() {
-	awk '{print $1}'
+	# shellcheck disable=SC2016
+	TZ=UTC awk \
+		-f "$src_dir/common.awk" \
+		-v timestamp="$1" \
+		-f <(echo '
+			after($0, timestamp) {
+				print $1
+			}
+		')
 }
 
 function get_urls() {
-	awk -F'"' '{
-		n = split($2, req_info, " ")
-		if (n == 0) { print "<empty>"; next }
-		if (n != 3) { print "<invalid>"; next }
+	# shellcheck disable=SC2016
+	TZ=UTC awk -F'"' \
+		-f "$src_dir/common.awk" \
+		-v timestamp="$1" \
+		-f <(echo '
+			after($0, timestamp) {
+				n = split($2, req_info, " ")
+				if (n == 0) { print "<empty>"; next }
+				if (n != 3) { print "<invalid>"; next }
 
-		url = req_info[2]
-		split(url, url_parts, /[?]/)
-		print url_parts[1]
-  }'
+				url = req_info[2]
+				split(url, url_parts, /[?]/)
+				print url_parts[1]
+			}
+		')
 }
 
 function get_errors() {
-	awk -F'"' '{
-		split($3, resp_info, " ")
-		code = resp_info[1]
-		if (code >= 400 && code < 500) { print "4xx" }
-		if (code >= 500 && code < 600) { print "5xx" }
-  }'
+	# shellcheck disable=SC2016
+	TZ=UTC awk -F'"' \
+		-f "$src_dir/common.awk" \
+		-v timestamp="$1" \
+		-f <(echo '
+			after($0, timestamp) {
+				split($3, resp_info, " ")
+				code = resp_info[1]
+				if (code >= 400 && code < 500) { print "4xx" }
+				if (code >= 500 && code < 600) { print "5xx" }
+			}
+		')
 }
 
 function get_codes() {
-	awk -F'"' '{
-		split($3, resp_info, " ")
-		code = resp_info[1]
-		print code
-	}'
+	# shellcheck disable=SC2016
+	TZ=UTC awk -F'"' \
+		-f "$src_dir/common.awk" \
+		-v timestamp="$1" \
+		-f <(echo '
+			after($0, timestamp) {
+				split($3, resp_info, " ")
+				code = resp_info[1]
+				print code
+			}
+		')
 }
 
 function stats() {
