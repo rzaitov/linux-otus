@@ -1,0 +1,7 @@
+[Unit]
+Description=systemd environment variable expansion demo
+
+[Service]
+Type=oneshot
+EnvironmentFile=/tmp/show-args.env
+ExecStart=/etc/show-args.sh $OPTIONS

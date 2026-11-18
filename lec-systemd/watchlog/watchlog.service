@@ -1,0 +1,7 @@
+[Unit]
+Description=Simple watchlog service
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/default/watchlog
+ExecStart=/opt/watchlog.sh ${WORD} ${LOG}

@@ -1,0 +1,10 @@
+[Unit]
+Description=Run watchlog script every 30 second
+
+[Timer]
+AccuracySec=5s
+OnActiveSec=0s
+OnUnitActiveSec=30s
+
+[Install]
+WantedBy=timers.target
